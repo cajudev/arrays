@@ -797,4 +797,29 @@ class ArraysTest extends TestCase
         self::assertEquals(0, $arrays->length);
     }
 
+    public function test_array_access_as_property() {
+        $arrays = new Arrays();
+        $arrays['lorem'] = 'dolor';
+        self::assertEquals('dolor', $arrays->lorem);
+    }
+
+    public function test_array_set_value_as_property() {
+        $arrays = new Arrays();
+        $arrays->lorem = 'dolor';
+        self::assertEquals(['lorem' => 'dolor'], $arrays->get());
+    }
+
+    public function test_array_check_isset_value_as_property() {
+        $arrays = new Arrays();
+        $arrays['lorem'] = 'dolor';
+        self::assertTrue(isset($arrays->lorem));
+        self::assertFalse(isset($arrays->ipsum));
+    }
+
+    public function test_array_unset_value_as_property() {
+        $arrays = new Arrays();
+        $arrays['lorem'] = 'dolor';
+        unset($arrays->lorem);
+        self::assertEquals([], $arrays->get());
+    }
 }

@@ -545,16 +545,40 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         $this->length -= $value;
     }
 
+    // ================================================================= //
+    // ======================= MAGIC METHODS =========================== //
+    // ================================================================= //
+
     public function __get($property) {
-        if ($property == 'length') {
+        if ($property === 'length') {
             return $this->length;
         }
+        return $this[$property] ?? null;
+    }
+
+    public function __set($property, $value) {
+        if ($property === 'length') {
+            throw new \InvalidArgumentException('length property is readonly');
+        }
+        $this[$property] = $value;
+    }
+
+    public function __isset($property) {
+        return isset($this->content[$property]);
+    }
+
+    public function __unset($property) {
+        unset($this->content[$property]);
     }
 
     public function __toString()
     {
         return json_encode($this->content, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
+
+    // ================================================================= //
+    // ======================= STATIC METHODS =========================== //
+    // ================================================================= //
 
     /**
      * Verify whether a element is an Arrays object
