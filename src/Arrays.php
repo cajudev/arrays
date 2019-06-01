@@ -12,12 +12,12 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     use \Cajudev\Traits\SortableTrait;
     use \Cajudev\Traits\ArrayAccessTrait;
 
-    protected const BREAK    = 'break';
-    protected const CONTINUE = 'continue';
+    const LOOP_BREAK    = 'break';
+    const LOOP_CONTINUE = 'continue';
 
-    protected const KEY_NOTATION      = '/^\w+$/';
-    protected const DOT_NOTATION      = '/(?<=\.|^)(?<key>\w+)(?=\.|$)/';
-    protected const INTERVAL_NOTATION = '/^(?<start>\w+):(?<end>\w+)$/';
+    const KEY_NOTATION      = '/^\w+$/';
+    const DOT_NOTATION      = '/(?<=\.|^)(?<key>\w+)(?=\.|$)/';
+    const INTERVAL_NOTATION = '/^(?<start>\w+):(?<end>\w+)$/';
 
     protected $content;
     protected $length;
@@ -41,10 +41,14 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return array
      */
-    private function parseObject(object $object): array
+    private function parseObject($object)
     {
         if ($object instanceof static) {
             return $object->get();
+        }
+
+        if (!is_object($object)) {
+            throw new \InvalidArgumentException('Argument must be an array or object');
         }
 
         $vars = (array) $object;
@@ -60,9 +64,9 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function setByReference(array &$array = null): self
+    public function setByReference(&$array = null)
     {
-        $array = $array ?? [];
+        $array = isset($array) ? $array : [];
         $this->content =& $array;
         $this->count();
         return $this;
@@ -75,7 +79,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return int
      */
-    public function count(int $mode = COUNT_NORMAL): int
+    public function count($mode = COUNT_NORMAL)
     {
         $this->length = count($this->content, $mode);
         return $this->length;
@@ -98,7 +102,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function unshift(...$values): self
+    public function unshift(...$values)
     {
         array_unshift($this->content, ...$values);
         $this->increment(count($values));
@@ -112,7 +116,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function push(...$values): self
+    public function push(...$values)
     {
         array_push($this->content, ...$values);
         $this->increment(count($values));
@@ -128,7 +132,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    public function for(int $i, int $add, callable $function)
+    public function xfor($i, $add, $function)
     {
         $keys   = array_keys($this->content);
         $count  = count($this->content);
@@ -136,8 +140,8 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         for ($i; ($add >= 0 ? $i < $count : $i >= 0); $i += $add) {
             $return = $function($keys[$i], $this->content[$keys[$i]]);
             switch ($return) {
-                case self::BREAK: break 2;
-                case self::CONTINUE; continue 2;
+                case self::LOOP_BREAK: break 2;
+                case self::LOOP_CONTINUE; continue 2;
             }
         }
     }
@@ -149,13 +153,13 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    public function each(callable $function)
+    public function each($function)
     {
         foreach ($this->content as $key => $value) {
             $return = $function($key, $value);
             switch ($return) {
-                case self::BREAK: break 2;
-                case self::CONTINUE; continue 2;
+                case self::LOOP_BREAK: break 2;
+                case self::LOOP_CONTINUE; continue 2;
             }
         }
     }
@@ -177,7 +181,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function contains($value): bool
+    public function contains($value)
     {
         return in_array($value, $this->content);
     }
@@ -189,7 +193,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function map(callable $handle): self
+    public function map($handle)
     {
         $keys = array_keys($this->content);
         $this->content = array_column(array_map($handle, $keys, $this->content), 1, 0);
@@ -203,7 +207,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function filter(callable $handle): self
+    public function filter($handle)
     {
         $this->content = array_filter($this->content, $handle, ARRAY_FILTER_USE_BOTH);
         $this->count();
@@ -217,7 +221,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function reduce(callable $handle)
+    public function reduce($handle)
     {
         $content = $this->content;
         $initial = array_shift($content);
@@ -235,7 +239,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function isset($key): bool
+    public function xisset($key)
     {
         return isset($this[$key]);
     }
@@ -247,7 +251,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function noset($key): bool
+    public function noset($key)
     {
         return !isset($this[$key]);
     }
@@ -259,7 +263,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function empty($key): bool
+    public function xempty($key)
     {
         return empty($this[$key]);
     }
@@ -271,7 +275,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function filled($key): bool
+    public function filled($key)
     {
         return !empty($this[$key]);
     }
@@ -283,7 +287,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    public function unset($key)
+    public function xunset($key)
     {
         unset($this[$key]);
     }
@@ -293,7 +297,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function shift(): self
+    public function shift()
     {
         array_shift($this->content);
         $this->decrement();
@@ -305,7 +309,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function pop(): self
+    public function pop()
     {
         array_pop($this->content);
         $this->decrement();
@@ -317,7 +321,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return string
      */
-    public function join(string $glue)
+    public function join($glue)
     {
         return implode($glue, $this->content);
     }
@@ -327,7 +331,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function flip(): self
+    public function flip()
     {
         $this->content = array_flip($this->content);
         return $this;
@@ -338,7 +342,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function keys(): self
+    public function keys()
     {
         return new static(array_keys($this->content));
     }
@@ -348,7 +352,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function values(): self
+    public function values()
     {
         return new static(array_values($this->content));
     }
@@ -361,7 +365,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function column($key, $index = null): ?self
+    public function column($key, $index = null)
     {
         return new static(array_column($this->content, $key, $index));
     }
@@ -374,7 +378,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function chunk(int $size, bool $preserve_keys = false): self
+    public function chunk($size, $preserve_keys = null)
     {
         $this->content = array_chunk($this->content, $size, $preserve_keys);
         $this->count();
@@ -386,7 +390,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function unique(): self
+    public function unique()
     {
         $this->content = array_unique($this->content);
         $this->count();
@@ -398,7 +402,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function merge(): self
+    public function merge()
     {
         $this->content = $this->reduce('array_merge')->get();
         $this->count();
@@ -410,7 +414,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function reverse($preserve_keys = null): self
+    public function reverse($preserve_keys = null)
     {
         $this->content = array_reverse($this->content, $preserve_keys);
         return $this;
@@ -419,7 +423,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     /**
      * Return a key from a value in array if it exists
      */
-    public function search($value, bool $strict = null)
+    public function search($value, $strict = null)
     {
         return array_search($value, $this->content, $strict);
     }
@@ -431,7 +435,9 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      */
     public function last()
     {
-        return $this->get(array_key_last($this->content));
+        $value = end($this->content);
+        reset($this->content);
+        return $value;
     }
 
     /**
@@ -439,7 +445,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function lower(): self
+    public function lower()
     {
         $this->content = array_change_key_case($this->content, CASE_LOWER);
         return $this;
@@ -450,7 +456,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function upper(): self
+    public function upper()
     {
         $this->content = array_change_key_case($this->content, CASE_UPPER);
         return $this;
@@ -472,12 +478,12 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         }
 
         if ($count === 1) {
-            return $this[$keys[0]] ?? null;
+            return isset($this[$keys[0]]) ? $this[$keys[0]] : null;
         }
 
         $return = [];
         foreach ($keys as $key) {
-            $return[] = $this[$key] ?? null;
+            $return[] = isset($this[$key]) ? $this[$key] : null;
         }
         return $return;
     }
@@ -531,8 +537,8 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    private function increment(int $value = 1) {
-        $this->length += $value;
+    private function increment($value = null) {
+        $this->length += isset($value) ? $value : 1;
     }
 
     /**
@@ -540,8 +546,8 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    private function decrement(int $value = 1) {
-        $this->length -= $value;
+    private function decrement($value = null) {
+        $this->length -= isset($value) ? $value : 1;
     }
 
     public function __get($property) {
@@ -562,7 +568,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
     */
-    public static function isArrays($object): bool
+    public static function isArrays($object)
     {
         return $object instanceof static;
     }
@@ -575,7 +581,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public static function combine($keys, $values): self
+    public static function combine($keys, $values)
     {
         if ($keys instanceof static) {
             $keys = $keys->get();

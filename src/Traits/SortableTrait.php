@@ -11,7 +11,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function sort(): self
+    public function sort()
     {
         sort($this->content);
         return $this;
@@ -22,7 +22,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function rsort(): self
+    public function rsort()
     {
         rsort($this->content);
         return $this;
@@ -33,7 +33,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function asort(): self
+    public function asort()
     {
         asort($this->content);
         return $this;
@@ -44,7 +44,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function arsort(): self
+    public function arsort()
     {
         arsort($this->content);
         return $this;
@@ -55,7 +55,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function ksort(): self
+    public function ksort()
     {
         ksort($this->content);
         return $this;
@@ -66,7 +66,7 @@ trait SortableTrait
      *
      * @return self
      */
-    public function krsort(): self
+    public function krsort()
     {
         krsort($this->content);
         return $this;

@@ -45,7 +45,7 @@ trait ArrayAccessTrait
         if (preg_match(static::INTERVAL_NOTATION, $key, $result)) {
             $start = $result['start'];
             $end   = $result['end'];
-            [$min, $max]  = $start < $end ? [$start, $end] : [$end, $start];
+            list($min, $max)  = $start < $end ? [$start, $end] : [$end, $start];
 
             for ($i = $min; $i <= $max; $i++) {
                 $this->increment(!array_key_exists($i, $this->content));
@@ -64,7 +64,7 @@ trait ArrayAccessTrait
      *
      * @return bool
      */
-    public function offsetExists($key): bool
+    public function offsetExists($key)
     {
         if (preg_match(static::KEY_NOTATION, $key)) {
             return isset($this->content[$key]);
@@ -84,7 +84,7 @@ trait ArrayAccessTrait
         if (preg_match(static::INTERVAL_NOTATION, $key, $result)) {
             $start = $result['start'];
             $end   = $result['end'];
-            [$min, $max]  = $start < $end ? [$start, $end] : [$end, $start];
+            list($min, $max)  = $start < $end ? [$start, $end] : [$end, $start];
 
             for ($i = $min; $i <= $max; $i++) {
                 if(!isset($this->content[$i])) {
@@ -128,7 +128,7 @@ trait ArrayAccessTrait
         if (preg_match(static::INTERVAL_NOTATION, $key, $result)) {
             $start = $result['start'];
             $end   = $result['end'];
-            [$min, $max]  = $start < $end ? [$start, $end] : [$end, $start];
+            list($min, $max)  = $start < $end ? [$start, $end] : [$end, $start];
 
             for ($i = $min; $i <= $max; $i++) {
                 $this->decrement(array_key_exists($i, $this->content));

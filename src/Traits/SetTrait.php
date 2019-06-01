@@ -9,7 +9,7 @@ trait SetTrait
      * 
      * @return self
      */
-    public function union(): self
+    public function union()
     {
         $this->content = $this->merge()->unique()->get();
         $this->count();
@@ -21,7 +21,7 @@ trait SetTrait
      * 
      * @return self
      */
-    public function diff(): self
+    public function diff()
     {   
         $this->content = $this->reduce('array_diff')->get();
         $this->count();
@@ -33,7 +33,7 @@ trait SetTrait
      * 
      * @return self
      */
-    public function intersect(): self
+    public function intersect()
     {
         $this->content = $this->reduce('array_intersect')->get();
         $this->count();
@@ -45,7 +45,7 @@ trait SetTrait
      * 
      * @return self
      */
-    public function cartesian(): self
+    public function cartesian()
     {
         $result = [[]];
         foreach ($this->content as $key => $values) {

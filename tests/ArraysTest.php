@@ -2,7 +2,13 @@
 
 use PHPUnit\Framework\TestCase;
 use Cajudev\Arrays;
-use Cajudev\Strings;
+
+// Used in a test bellow
+class Test {
+    private   $private = 'lorem';
+    public    $public = 'ipsum';
+    protected $protected = 'dolor';
+};
 
 class ArraysTest extends TestCase
 {
@@ -15,11 +21,7 @@ class ArraysTest extends TestCase
 
     public function test_creating_from_object_should_parse_attributes()
     {
-        $object = new class {
-            private   $private = 'lorem';
-            public    $public = 'ipsum';
-            protected $protected = 'dolor';
-        };
+        $object = new Test();
         $arrays = new Arrays($object);
         $expect = ['private' => 'lorem', 'public' => 'ipsum', 'protected' => 'dolor'];
         self::assertEquals($expect, $arrays->get());
@@ -34,7 +36,7 @@ class ArraysTest extends TestCase
 
     public function test_creating_from_another_type_must_throws_exception()
     {
-        self::expectException(\TypeError::class);
+        self::expectException(\InvalidArgumentException::class);
         $arrays = new Arrays('lorem');
     }
 
@@ -248,19 +250,19 @@ class ArraysTest extends TestCase
     public function test_interval_notation_isset_should_return_false()
     {
         $arrays = new Arrays([1 => 'a', 'b', 'c', 'd', 'e']);
-        self::assertTrue($arrays->isset('1:5'));
+        self::assertTrue($arrays->xisset('1:5'));
     }
 
     public function test_interval_notation_isset_should_return_true()
     {
         $arrays = new Arrays([1 => 'a', 'b', 'c', 'd', 'e']);
-        self::assertTrue($arrays->isset('1:5'));
+        self::assertTrue($arrays->xisset('1:5'));
     }
 
     public function test_interval_notation_unset_values()
     {
         $arrays = new Arrays([0, 1, 2, 3, 4, 5]);
-        $arrays->unset('2:4');
+        $arrays->xunset('2:4');
         self::assertEquals([0, 1, 5 => 5], $arrays->get());
     }
 
@@ -297,7 +299,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem'] = 'ipsum';
         self::assertEquals(true, isset($array['lorem']));
-        self::assertEquals(true, $array->isset('lorem'));
+        self::assertEquals(true, $array->xisset('lorem'));
     }
 
     public function test_isset_should_return_false()
@@ -305,7 +307,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem'] = 'ipsum';
         self::assertEquals(false, isset($array['ipsum']));
-        self::assertEquals(false, $array->isset('ipsum'));
+        self::assertEquals(false, $array->xisset('ipsum'));
     }
 
     public function test_isset_with_dot_notation_should_return_true()
@@ -313,7 +315,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem.ipsum'] = 'ipsum';
         self::assertEquals(true, isset($array['lorem.ipsum']));
-        self::assertEquals(true, $array->isset('lorem.ipsum'));
+        self::assertEquals(true, $array->xisset('lorem.ipsum'));
     }
 
     public function test_isset_with_dot_notation_should_return_false()
@@ -321,7 +323,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem.ipsum'] = 'ipsum';
         self::assertEquals(false, isset($array['lorem.dolor']));
-        self::assertEquals(false, $array->isset('lorem.dolor'));
+        self::assertEquals(false, $array->xisset('lorem.dolor'));
     }
 
     public function test_noset_should_return_false()
@@ -356,14 +358,14 @@ class ArraysTest extends TestCase
     {
         $array = new Arrays();
         $array['lorem'] = 'ipsum';
-        self::assertEquals(false, $array->empty('lorem'));
+        self::assertEquals(false, $array->xempty('lorem'));
     }
 
     public function test_empty_should_return_true()
     {
         $array = new Arrays();
         $array['lorem'] = 'ipsum';
-        self::assertEquals(true, $array->empty('ipsum'));
+        self::assertEquals(true, $array->xempty('ipsum'));
     }
 
     public function test_empty_with_dot_notation_should_return_true()
@@ -371,7 +373,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem.ipsum'] = false;
         self::assertEquals(true, empty($array['lorem.ipsum']));
-        self::assertEquals(true, $array->empty('lorem.ipsum'));
+        self::assertEquals(true, $array->xempty('lorem.ipsum'));
     }
 
     public function test_empty_with_dot_notation_should_return_false()
@@ -379,7 +381,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem.ipsum'] = 'ipsum';
         self::assertEquals(false, empty($array['lorem.ipsum']));
-        self::assertEquals(false, $array->empty('lorem.ipsum'));
+        self::assertEquals(false, $array->xempty('lorem.ipsum'));
     }
 
     public function test_filled_should_return_true()
@@ -414,8 +416,8 @@ class ArraysTest extends TestCase
     {
         $array = new Arrays();
         $array['lorem.ipsum'] = 'sit';
-        $array->unset('lorem.ipsum');
-        self::assertEquals(false, $array->isset('lorem.ipsum'));
+        $array->xunset('lorem.ipsum');
+        self::assertEquals(false, $array->xisset('lorem.ipsum'));
     }
 
     public function test_unset_key_using_dot_notation_and_function()
@@ -423,7 +425,7 @@ class ArraysTest extends TestCase
         $array = new Arrays();
         $array['lorem.ipsum'] = 'sit';
         unset($array['lorem.ipsum']);
-        self::assertEquals(false, $array->isset('lorem.ipsum'));
+        self::assertEquals(false, $array->xisset('lorem.ipsum'));
     }
 
     public function test_iterating_array_foreach()
@@ -445,7 +447,7 @@ class ArraysTest extends TestCase
     public function test_iterating_using_method_for_forward()
     {
         $arrays = new Arrays(['lorem', 'ipsum', 'dolor', 'sit']);
-        $arrays->for(0, 1, function($key, $value) use ($arrays) {
+        $arrays->xfor(0, 1, function($key, $value) use ($arrays) {
             self::assertEquals($arrays[$key], $value);
         });
     }
@@ -453,7 +455,7 @@ class ArraysTest extends TestCase
     public function test_iterating_using_method_for_backward()
     {
         $arrays = new Arrays(['lorem', 'ipsum', 'dolor', 'sit']);
-        $arrays->for($arrays->count() - 1, -1, function($key, $value) use ($arrays) {
+        $arrays->xfor($arrays->count() - 1, -1, function($key, $value) use ($arrays) {
             self::assertEquals($arrays[$key], $value);
         });
     }
@@ -593,7 +595,7 @@ class ArraysTest extends TestCase
     {
         $arrays = new Arrays([1, 2, 3, 4, 5, 6]); //6
         unset($arrays[0]); //5
-        $arrays->unset(1); //4
+        $arrays->xunset(1); //4
         $arrays['lorem.ipsum'] = ['lorem' => 'ipsum']; //5
         $arrays[] = 'dolor'; //6
         $arrays->push(1, 2, 3); //9
@@ -718,9 +720,9 @@ class ArraysTest extends TestCase
     {
         $arrays = new Arrays(['lorem' => 1, 'ipsum' => 2, 'dolor' => 3]);
         $arrays->backup();
-        $arrays->unset('lorem');
-        $arrays->unset('ipsum');
-        $arrays->unset('dolor');
+        $arrays->xunset('lorem');
+        $arrays->xunset('ipsum');
+        $arrays->xunset('dolor');
         $arrays->restore();
         $expect = ['lorem' => 1, 'ipsum' => 2, 'dolor' => 3];
         self::assertSame($expect, $arrays->get());
@@ -794,7 +796,7 @@ class ArraysTest extends TestCase
     public function test_length_after_unset_value() {
         $arrays = new Arrays();
         $arrays['lorem'] = 'dolor';
-        $arrays->unset('lorem');
+        $arrays->xunset('lorem');
         self::assertEquals(0, $arrays->length);
     }
 
