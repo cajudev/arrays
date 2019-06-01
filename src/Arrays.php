@@ -437,7 +437,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     {
         $value = end($this->content);
         reset($this->content);
-        return $value;
+        return is_array($value) ? new static($value) : $value;
     }
 
     /**
