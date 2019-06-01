@@ -132,7 +132,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    public function xfor($i, $add, $function)
+    public function _for($i, $add, $function)
     {
         $keys   = array_keys($this->content);
         $count  = count($this->content);
@@ -239,7 +239,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function xisset($key)
+    public function _isset($key)
     {
         return isset($this[$key]);
     }
@@ -263,7 +263,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return bool
      */
-    public function xempty($key)
+    public function _empty($key)
     {
         return empty($this[$key]);
     }
@@ -287,7 +287,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return void
      */
-    public function xunset($key)
+    public function _unset($key)
     {
         unset($this[$key]);
     }
