@@ -558,7 +558,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         if ($property === 'length') {
             return $this->length;
         }
-        return $this[$property] ?? null;
+        return isset($this[$property]) ? $this[$property] : null;
     }
 
     public function __set($property, $value) {
