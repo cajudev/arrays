@@ -77,7 +77,11 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      */
     public function count(int $mode = COUNT_NORMAL): int
     {
-        $this->length = count($this->content, $mode);
+        if ($mode === COUNT_RECURSIVE) {
+            return count($this->content, $mode);
+        }
+
+        $this->length = count($this->content);
         return $this->length;
     }
 
