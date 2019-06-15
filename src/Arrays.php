@@ -15,9 +15,9 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     protected const BREAK    = 'break';
     protected const CONTINUE = 'continue';
 
-    protected const KEY_NOTATION      = '/^\w+$/';
-    protected const DOT_NOTATION      = '/(?<=\.|^)(?<key>\w+)(?=\.|$)/';
-    protected const INTERVAL_NOTATION = '/^(?<start>\w+):(?<end>\w+)$/';
+    protected const KEY_NOTATION      = '/^[\w-]+$/';
+    protected const DOT_NOTATION      = '/(?<=\.|^)(?<key>[\w-]+)(?=\.|$)/';
+    protected const INTERVAL_NOTATION = '/^(?<start>\d+):(?<end>\d+)$/';
 
     protected $content;
     protected $length;
