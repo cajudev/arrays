@@ -489,7 +489,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         foreach ($keys as $key) {
             $return[] = isset($this[$key]) ? $this[$key] : null;
         }
-        return $return;
+        return new static($return);
     }
 
     /**
