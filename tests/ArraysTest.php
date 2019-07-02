@@ -345,28 +345,28 @@ class ArraysTest extends TestCase
     {
         self::expectException(InvalidArgumentException::class);
         $arrays = new Arrays();
-        $arrays['3^4'];
+        $arrays['A:B'];
     }
 
     public function test_trying_set_using_wrong_pattern()
     {
         self::expectException(InvalidArgumentException::class);
         $arrays = new Arrays();
-        $arrays['3^4'] = 10;
+        $arrays['A:B'] = 10;
     }
 
     public function test_trying_isset_using_wrong_pattern()
     {
         self::expectException(InvalidArgumentException::class);
         $arrays = new Arrays();
-        isset($arrays['3^4']);
+        isset($arrays['A:B']);
     }
 
     public function test_trying_unset_using_wrong_pattern()
     {
         self::expectException(InvalidArgumentException::class);
         $arrays = new Arrays();
-        unset($arrays['3^4']);
+        unset($arrays['A:B']);
     }
 
     public function test_isset_should_return_true()
