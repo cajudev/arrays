@@ -73,7 +73,7 @@ trait ArrayAccessTrait
         if (preg_match_all(static::DOT_NOTATION, $key, $keys)) {
             $ret =& $this->content;
             while (count($keys['key']) > 0) {
-                if (!isset($keys['key'][0])) {
+                if (!isset($ret[$keys['key'][0]])) {
                     return false;
                 }
                 $ret =& $ret[array_shift($keys['key'])];
