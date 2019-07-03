@@ -480,9 +480,15 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
             return $this[$keys[0]] ?? null;
         }
 
+        $f = function($key) {
+            return array_slice(explode('.', $key), -1, 1)[0];
+        };
+
         $return = [];
         foreach ($keys as $key) {
-            $return[] = $this[$key] ?? null;
+            $value = $this[$key] ?? null;
+            $return[]         = $value;
+            $return[$f($key)] = $value;
         }
         return new static($return);
     }

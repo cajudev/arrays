@@ -159,9 +159,16 @@ class ArraysTest extends TestCase
 
     public function test_get_several_values()
     {
-        $arrays = new Arrays(['lorem' => 'ipsum', 'dolor' => 'sit']);
-        $expect = ['ipsum', 'sit', null];
-        self::assertEquals($expect, $arrays->get('lorem', 'dolor', 'amet')->get());
+            $arrays = new Arrays(['lorem' => 'ipsum', 'dolor' => 'sit']);
+            $expect = [
+                'ipsum',
+                'lorem' => 'ipsum',
+                'sit',
+                'dolor' => 'sit',
+                 null,
+                'amet'  => null,
+            ];
+            self::assertEquals($expect, $arrays->get('lorem', 'dolor', 'amet')->get());
     }
 
     public function test_get_values_using_dot_notation()
@@ -232,8 +239,16 @@ class ArraysTest extends TestCase
         $arrays = new Arrays();
         $arrays['lorem']['ipsum']['dolor'] = 'amet';
         $arrays['lorem']['ipsum']['sit'] = 'dolor';
-        self::assertEquals(['amet', 'dolor'], $arrays->get('lorem.ipsum.dolor', 'lorem.ipsum.sit')->get());
-    }
+
+        $expect = [
+            'amet',
+            'dolor' => 'amet',
+            'dolor',
+            'sit' => 'dolor',
+        ];
+        
+        self::assertEquals($expect, $arrays->get('lorem.ipsum.dolor', 'lorem.ipsum.sit')->get());
+}
 
     public function test_interval_notation_index_key()
     {
