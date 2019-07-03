@@ -482,12 +482,18 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         }
 
         if ($count === 1) {
-            return isset($this[$keys[0]]) ? $this[$keys[0]] : null;
+            return $this[$keys[0]] ?? null;
         }
+
+        $f = function($key) {
+            return array_slice(explode('.', $key), -1, 1)[0];
+        };
 
         $return = [];
         foreach ($keys as $key) {
-            $return[] = isset($this[$key]) ? $this[$key] : null;
+            $value = $this[$key] ?? null;
+            $return[]         = $value;
+            $return[$f($key)] = $value;
         }
         return new static($return);
     }
