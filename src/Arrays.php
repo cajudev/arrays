@@ -491,7 +491,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
 
         $return = [];
         foreach ($keys as $key) {
-            $value = $this[$key] ?? null;
+            $value = isset($this[$key]) ? $this[$key] : null;
             $return[]         = $value;
             $return[$f($key)] = $value;
         }
