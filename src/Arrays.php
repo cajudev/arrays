@@ -482,7 +482,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         }
 
         if ($count === 1) {
-            return isset($this[$key]) ? $this[$key] : null;
+            return isset($this[$keys[0]]) ? $this[$keys[0]] : null;
         }
 
         $f = function($key) {
