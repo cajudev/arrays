@@ -226,10 +226,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         $content = $this->content;
         $initial = array_shift($content);
         $result  = array_reduce($content, $handle, $initial);
-        if (is_array($result)) {
-            $result = new static($result);
-        }
-        return $result;
+        return $this->return($result);
     }
 
     /**
@@ -293,27 +290,27 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     }
 
     /**
-     * Remove the first element from an array
+     * Remove the first element from an array, and return the removed value
      *
-     * @return self
+     * @return mixed
      */
-    public function shift(): self
+    public function shift()
     {
-        array_shift($this->content);
+        $value = array_shift($this->content);
         $this->decrement();
-        return $this;
+        return $this->return($value);
     }
 
     /**
-     * Remove the last element from an array
+     * Remove the last element from an array, and return the removed value
      *
-     * @return self
+     * @return mixed
      */
-    public function pop(): self
+    public function pop()
     {
-        array_pop($this->content);
+        $value = array_pop($this->content);
         $this->decrement();
-        return $this;
+        return $this->return($value);
     }
 
     /**
@@ -446,7 +443,12 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      */
     public function lower(): self
     {
-        $this->content = array_change_key_case($this->content, CASE_LOWER);
+        $lower = function(&$array) use (&$lower) {
+            $array = array_change_key_case($array, CASE_LOWER);
+            foreach ($array as $key => $value)
+                if (is_array($value)) $lower($array[$key]);
+        };
+        $lower($this->content);
         return $this;
     }
 
@@ -457,7 +459,12 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      */
     public function upper(): self
     {
-        $this->content = array_change_key_case($this->content, CASE_UPPER);
+        $upper = function(&$array) use (&$upper) {
+            $array = array_change_key_case($array, CASE_UPPER);
+            foreach ($array as $key => $value)
+                if (is_array($value)) $upper($array[$key]);
+        };
+        $upper($this->content);
         return $this;
     }
 
@@ -480,38 +487,28 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
             return $this[$keys[0]] ?? null;
         }
 
-        $return = [];
+        $last = function($key) {
+            return array_slice(explode('.', $key), -1, 1)[0];
+        };
+
+        $return = new static();
         foreach ($keys as $key) {
-            $return[] = $this[$key] ?? null;
+            $return[$last($key)] = $this[$key] ?? null;
         }
-        return new static($return);
+        return $return;
     }
 
     /**
-     * Insert a value in a associated key or keys
+     * Insert a value in a associated key
      *
-     * @param  mixed $keys
+     * @param  string $key
+     * $param  mixed $value
      *
      * @return mixed
      */
-    public function set($value, ...$keys)
+    public function set($value, string $key)
     {
-        $count = count($keys);
-
-        if ($count === 0) {
-            $this[] = $value;
-            return $this;
-        }
-
-        if ($count === 1) {
-            $this[$keys[0]] = $value;
-            return $this;
-        }
-
-        foreach ($keys as $key) {
-            $this[$key] = $value;
-        }
-
+        $this[$key] = $value;
         return $this;
     }
 
@@ -529,6 +526,15 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
         $this->content = $this->backup;
         $this->backup  = null;
         $this->count();
+    }
+
+    /**
+     * Return a new object if value is an object, else return the value
+     *
+     * @return mixed
+     */
+    private function return($content) {
+        return is_array($content) ? new static($content) : $content;
     }
 
     /**
