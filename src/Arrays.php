@@ -433,7 +433,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
     public function last()
     {
         $value = $this->get(array_key_last($this->content));
-        return is_array($value) ? new static($value) : $value;
+        return $this->return($value);
     }
 
     /**
