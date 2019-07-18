@@ -391,7 +391,7 @@ class Arrays implements \ArrayAccess, \IteratorAggregate, \Countable, Sortable, 
      *
      * @return self
      */
-    public function unique(int $flags = SORT_STRING)
+    public function unique($flags = SORT_STRING)
     {
         $this->content = array_unique($this->content, $flags);
         $this->count();
